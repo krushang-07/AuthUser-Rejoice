@@ -9,9 +9,32 @@ const Signup = () => {
     password: "",
   });
   const navigate = useNavigate();
+  const [errors, setErrors] = useState({});
+
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!formData.name.trim()) {
+      newErrors.name = "Name is required";
+    }
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = "Please enter a valid email address";
+    }
+    if (!formData.password.trim()) {
+      newErrors.password = "Password is required";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0; // Return true if no errors
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateForm()) {
+      return;
+    }
     try {
       await axios.post("http://localhost:5000/api/auth/signup", formData);
       navigate("/login");
@@ -22,6 +45,9 @@ const Signup = () => {
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    if (errors[e.target.name]) {
+      setErrors({ ...errors, [e.target.name]: "" });
+    }
   };
 
   return (
@@ -31,6 +57,7 @@ const Signup = () => {
           Create an Account
         </h2>
         <form onSubmit={handleSubmit}>
+          {/* Name Field */}
           <div className="mb-4">
             <label
               htmlFor="name"
@@ -42,14 +69,19 @@ const Signup = () => {
               type="text"
               id="name"
               name="name"
-              className="mt-1 px-4 py-2 border rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className={`mt-1 px-4 py-2 border rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                errors.name ? "border-red-500 focus:ring-red-500" : ""
+              }`}
               placeholder="Enter your name"
               value={formData.name}
               onChange={handleChange}
-              required
             />
+            {errors.name && (
+              <p className="text-red-500 text-sm mt-1">{errors.name}</p>
+            )}
           </div>
 
+          {/* Email Field */}
           <div className="mb-4">
             <label
               htmlFor="email"
@@ -61,14 +93,19 @@ const Signup = () => {
               type="email"
               id="email"
               name="email"
-              className="mt-1 px-4 py-2 border rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className={`mt-1 px-4 py-2 border rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                errors.email ? "border-red-500 focus:ring-red-500" : ""
+              }`}
               placeholder="Enter your email"
               value={formData.email}
               onChange={handleChange}
-              required
             />
+            {errors.email && (
+              <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+            )}
           </div>
 
+          {/* Password Field */}
           <div className="mb-4">
             <label
               htmlFor="password"
@@ -80,12 +117,16 @@ const Signup = () => {
               type="password"
               id="password"
               name="password"
-              className="mt-1 px-4 py-2 border rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className={`mt-1 px-4 py-2 border rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                errors.password ? "border-red-500 focus:ring-red-500" : ""
+              }`}
               placeholder="Enter your password"
               value={formData.password}
               onChange={handleChange}
-              required
             />
+            {errors.password && (
+              <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+            )}
           </div>
 
           <button

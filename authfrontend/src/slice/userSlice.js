@@ -1,26 +1,23 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axiosInstance from "../utils/axiosInstance";
 
-export const fetchData = createAsyncThunk(
-  "data/fetchData",
-  async ({ id, username }) => {
-    try {
-      const url = "/users";
+export const fetchData = createAsyncThunk("data/fetchData", async (params) => {
+  try {
+    const url = "/users";
+    //directly object pass not required this step
+    // const queryParams = {};
+    // if (id) queryParams.id = id;
+    // if (username) queryParams.username = username;
 
-      const queryParams = {};
-      if (id) queryParams.id = id;
-      if (username) queryParams.username = username;
-
-      const response = await axiosInstance.get(url, {
-        params: queryParams,
-      });
-      console.log(response);
-      return response.data;
-    } catch (error) {
-      throw new Error("Failed to fetch data");
-    }
+    const response = await axiosInstance.get(url, {
+      params: params,
+    });
+    // console.log(response);
+    return response.data;
+  } catch (error) {
+    throw new Error("Failed to fetch data");
   }
-);
+});
 
 const userSlice = createSlice({
   name: "data",

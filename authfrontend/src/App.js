@@ -5,6 +5,7 @@ import Home from "./pages/Home";
 import ProtectedRoute from "./components/protectedRoutes";
 import { useRoutes } from "react-router-dom";
 
+
 //Dynamic Routing using useRoutes();
 const AppRoutes = () => {
   const routes = useRoutes([
