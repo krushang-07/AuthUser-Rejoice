@@ -14,16 +14,13 @@ const Signup = () => {
   const validateForm = () => {
     const newErrors = {};
 
-    if (!formData.name.trim()) {
-      newErrors.name = "Name is required";
-    }
+    if (!formData.name.trim()) newErrors.name = "Name is required";
+    if (!formData.password.trim()) newErrors.password = "Password is required";
+
     if (!formData.email.trim()) {
       newErrors.email = "Email is required";
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = "Please enter a valid email address";
-    }
-    if (!formData.password.trim()) {
-      newErrors.password = "Password is required";
     }
 
     setErrors(newErrors);
