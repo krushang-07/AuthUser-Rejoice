@@ -17,16 +17,21 @@ const userSchema = new mongoose.Schema(
       unique: true,
       validate: {
         validator: function (v) {
-          // Use the validator package's isEmail function to validate the email format
           return validator.isEmail(v);
         },
-        message: (props) => `${props.value} is not a valid email!`, // Custom error message
+        message: (props) => `${props.value} is not a valid email!`,
       },
     },
     password: {
       type: String,
-      required: [true, "Password is required"],
-      minlength: [6, "Password must be at least 6 characters long"],
+      required: function () {
+        return !this.googleId; // Password is required if not using Google authentication
+      },
+    },
+    googleId: {
+      type: String,
+      unique: true,
+      sparse: true, // Allows multiple documents without this field
     },
   },
   {
@@ -34,12 +39,14 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-// Hash password before saving with salt
+// Hash the password before saving the user model
 userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) return next();
-  const salt = await bcrypt.genSalt(10);
-  this.password = await bcrypt.hash(this.password, salt);
+  if (this.isModified("password") && this.password) {
+    this.password = await bcrypt.hash(this.password, 12);
+  }
   next();
 });
 
-module.exports = mongoose.model("User", userSchema);
+const User = mongoose.model("User", userSchema);
+
+module.exports = User;

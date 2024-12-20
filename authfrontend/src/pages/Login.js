@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { login } from "../slice/authSlice";
 import { useDispatch } from "react-redux";
 import { Link } from "react-router-dom";
+import { GoogleLogin } from "@react-oauth/google";
 
 const Login = () => {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -50,6 +51,24 @@ const Login = () => {
     if (errors[e.target.name]) {
       setErrors({ ...errors, [e.target.name]: "" });
     }
+  };
+
+  const handleGoogleSuccess = async (response) => {
+    try {
+      const { data } = await axios.post(
+        "http://localhost:5000/api/auth/google-login",
+        { token: response.credential }
+      );
+      localStorage.setItem("token", data.token);
+      dispatch(login());
+      navigate("/");
+    } catch (error) {
+      alert("Google login failed");
+    }
+  };
+
+  const handleGoogleFailure = (error) => {
+    console.error("Google Login Failed:", error);
   };
 
   return (
@@ -117,6 +136,23 @@ const Login = () => {
             Sign Up
           </Link>
         </p>
+        {/* <p className="mt-4 text-sm text-center text-gray-600">
+          <Link
+            to="/forgot-password"
+            className="text-blue-500 hover:underline font-semibold"
+          >
+            Forgot Password?
+          </Link>
+        </p> */}
+        <div className="mt-4">
+          <GoogleLogin
+            onSuccess={handleGoogleSuccess}
+            onFailure={handleGoogleFailure}
+            onError={() => {
+              alert("Google login failed");
+            }}
+          />
+        </div>
       </div>
     </div>
   );

@@ -1,6 +1,9 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { GoogleLogin } from "@react-oauth/google";
+//import { Link } from "react-router-dom";
+//import { response } from "express";
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -34,7 +37,7 @@ const Signup = () => {
     }
     try {
       await axios.post("http://localhost:5000/api/auth/signup", formData);
-      navigate("/login");
+      navigate("/");
     } catch (error) {
       alert("Signup failed");
     }
@@ -47,6 +50,20 @@ const Signup = () => {
     }
   };
 
+  const handleGoogleSuccess = async (response) => {
+    try {
+      await axios.post("http://localhost:5000/api/auth/google-signup", {
+        token: response.credential,
+      });
+      navigate("/");
+    } catch (error) {
+      alert("Google signup failed");
+    }
+  };
+
+  const handleGoogleFailure = (error) => {
+    console.error("Google Login Failed:", error);
+  };
   return (
     <div className="bg-gray-100 flex items-center justify-center min-h-screen">
       <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-sm">
@@ -133,6 +150,23 @@ const Signup = () => {
             Sign Up
           </button>
         </form>
+        {/* <p className="mt-4 text-sm text-center text-gray-600">
+          <Link
+            to="/forgot-password"
+            className="text-blue-500 hover:underline font-semibold"
+          >
+            Forgot Password?
+          </Link>
+        </p> */}
+        <div className="mt-4">
+          <GoogleLogin
+            onSuccess={handleGoogleSuccess}
+            onFailure={handleGoogleFailure}
+            onError={() => {
+              alert("Google signup failed");
+            }}
+          />
+        </div>
       </div>
     </div>
   );
